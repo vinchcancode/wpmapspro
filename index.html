@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artist Map with Search</title>
+    <title>Artist Map with Search and Zoom Out</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-search/dist/leaflet-search.min.css" />
     <style>
@@ -40,10 +40,57 @@
             color: #333; /* Dark text color */
             font-family: Arial, sans-serif;
         }
+
+        /* Search field styling */
+        .search-container {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 400px;
+            z-index: 1000; /* Ensure it is above the map */
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Zoom out button styling */
+        .zoom-out-btn {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            z-index: 1000; /* Ensure it is above the map */
+        }
+
+        .zoom-out-btn:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
+    <div class="search-container">
+        <input type="text" id="searchField" class="search-input" placeholder="Search for an artist..." />
+    </div>
     <div id="map"></div>
+    <button class="zoom-out-btn" id="zoomOutButton">Zoom Out</button>
 
     <footer>
         Developed by: Vinch
@@ -120,26 +167,30 @@
             var marker = L.marker(artist.location, { title: artist.name }).addTo(map)
                 .bindPopup(profile);
 
-            // Store the marker for the search
+            // Store the marker for later search
             artist.marker = marker;
             markers.push(marker);
         });
 
-        // Create the search control
-        var searchControl = new L.Control.Search({
-            layer: L.layerGroup(markers), // Layer to search through (all artist markers)
-            initial: false, // Disable auto-initialization of search
-            propertyName: 'title', // Search based on the marker's title (artist name)
-            zoom: 12, // Zoom level after search
-            marker: false // Disable the search result marker (we just focus on the original marker)
+        // Implement the search functionality for the search field
+        document.getElementById('searchField').addEventListener('input', function(e) {
+            var searchQuery = e.target.value.toLowerCase().trim();
+
+            // Iterate over the artists and search for matches
+            var matchedArtist = artists.find(function(artist) {
+                return artist.name.toLowerCase().includes(searchQuery);
+            });
+
+            if (matchedArtist) {
+                var marker = matchedArtist.marker;
+                map.setView(marker.getLatLng(), 12); // Zoom to the location
+                marker.openPopup(); // Open the popup for the found artist
+            }
         });
 
-        // Add search control to the map
-        map.addControl(searchControl);
-
-        // Optional: Add a reset zoom feature
-        map.on('search:locationfound', function(e) {
-            map.setView(e.latlng, 14); // Zoom in after search result is found
+        // Zoom out button functionality
+        document.getElementById('zoomOutButton').addEventListener('click', function() {
+            map.setView([56.1304, -106.3468], 4); // Zoom out to the initial view (Canada)
         });
     </script>
 </body>
