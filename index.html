@@ -10,6 +10,12 @@
         .popup-content {
             text-align: center;
         }
+        .popup-content img {
+            width: 100px; /* Adjust size */
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -18,28 +24,20 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
         // Initialize the map and set the default view to Canada
-        var map = L.map('map', {
-            center: [56.1304, -106.3468], // Coordinates for Canada
-            zoom: 4, // Initial zoom level
-            maxZoom: 6, // Limit the maximum zoom level
-            minZoom: 3, // Limit the minimum zoom level
-            maxBounds: [
-                [41.0, -140.0], // Southwest corner of Canada
-                [83.0, -50.0] // Northeast corner of Canada
-            ], // Prevent the map from moving outside the Canadian bounds
-            zoomControl: true // Enable zoom control buttons
-        });
+        var map = L.map('map').setView([56.1304, -106.3468], 4);  // Coordinates for Canada
 
         // Add OpenStreetMap tile layer to the map
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            noWrap: true // This prevents the map from repeating itself
+            maxZoom: 19,  // Maximum zoom level
+            minZoom: 3     // Minimum zoom level
         }).addTo(map);
 
-        // Function to create artist profiles
-        function createArtistProfile(name, bio, location) {
+        // Function to create artist profiles with an image
+        function createArtistProfile(name, bio, location, imageUrl) {
             return `
                 <div class="popup-content">
+                    <img src="${imageUrl}" alt="${name}" />
                     <h3>${name}</h3>
                     <p><strong>Location:</strong> ${location}</p>
                     <p><strong>Bio:</strong> ${bio}</p>
@@ -47,17 +45,19 @@
             `;
         }
 
-        // Add a pin for Jane Doe at a specific location in Canada
-        var janeDoeLocation = [45.4215, -75.6992]; // Example: Ottawa, Canada
-        var janeDoeProfile = createArtistProfile('Jane Doe', 'A talented artist from Canada specializing in abstract painting.', 'Ottawa, Canada');
+        // Example for artist Jane Doe
+        var janeDoeLocation = [45.4215, -75.6992]; // Ottawa, Canada
+        var janeDoeImage = 'https://images.squarespace-cdn.com/content/v1/5e2a59e571a0167764997885/312ac8c9-c62d-4f7d-9695-ed52ba7d7f3f/SolenneM_Compressed.jpg'; // Replace with actual image URL
+        var janeDoeProfile = createArtistProfile('Jane Doe', 'A talented artist from Canada specializing in abstract painting.', 'Ottawa, Canada', janeDoeImage);
 
         // Create a marker for Jane Doe and bind a popup
         L.marker(janeDoeLocation).addTo(map)
             .bindPopup(janeDoeProfile);
 
-        // You can add more markers for other artists in a similar way
+        // Example for artist John Smith
         var artistLocation = [49.2827, -123.1207]; // Vancouver, Canada
-        var artistProfile = createArtistProfile('John Smith', 'A contemporary artist known for his sculpture work.', 'Vancouver, Canada');
+        var artistImage = 'https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTExL2Rlc2lnbndpdGhtZTA5X2FfcmVhbGlzdGljX3Bob3RvX29mX2FfcGVyc29uX3Npbmdpbmdfd2l0aF9hX21pY185MDk4Yzc0OS0zMmJkLTQ3YzUtOTBmNS05YTdiYzBmN2ZmZDkucG5n.png'; // Replace with actual image URL
+        var artistProfile = createArtistProfile('John Smith', 'A contemporary artist known for his sculpture work.', 'Vancouver, Canada', artistImage);
 
         // Add another artist marker
         L.marker(artistLocation).addTo(map)
