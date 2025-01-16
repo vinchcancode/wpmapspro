@@ -3,25 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artist Map</title>
+    <title>Artist Map with Search</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-search/dist/leaflet-search.min.css" />
     <style>
-        #map { height: 600px; width: 100%; }
+        #map { 
+            height: 600px; 
+            width: 100%; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Bottom border shadow */
+        }
+
         .popup-content {
             text-align: center;
+            background-color: rgb(119, 103, 79); /* Apply the background color */
+            padding: 10px;
+            border-radius: 8px;
+            color: white; /* Text color for contrast */
         }
+
         .popup-content img {
             width: 100px; /* Adjust size */
             height: 100px;
             border-radius: 50%;
             margin-bottom: 10px;
         }
+
+        /* Footer Styling */
+        footer {
+            text-align: center;
+            font-size: 12px; /* Small font size */
+            padding: 10px 0;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #f1f1f1; /* Light background */
+            color: #333; /* Dark text color */
+            font-family: Arial, sans-serif;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
 
+    <footer>
+        Developed by: Vinch
+    </footer>
+
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-search/dist/leaflet-search.min.js"></script>
     <script>
         // Initialize the map and set the default view to Canada
         var map = L.map('map').setView([56.1304, -106.3468], 4);  // Coordinates for Canada
@@ -45,23 +74,73 @@
             `;
         }
 
-        // Example for artist Jane Doe
-        var janeDoeLocation = [45.4215, -75.6992]; // Ottawa, Canada
-        var janeDoeImage = 'https://images.squarespace-cdn.com/content/v1/5e2a59e571a0167764997885/312ac8c9-c62d-4f7d-9695-ed52ba7d7f3f/SolenneM_Compressed.jpg'; // Replace with actual image URL
-        var janeDoeProfile = createArtistProfile('Jane Doe', 'A talented artist from Canada specializing in abstract painting.', 'Ottawa, Canada', janeDoeImage);
+        // Artist Data with additional artists and locations
+        var artists = [
+            { 
+                name: 'Jane Doe', 
+                location: [45.4215, -75.6992], // Ottawa, Canada
+                bio: 'A talented artist from Canada specializing in abstract painting.',
+                image: 'https://via.placeholder.com/100', // Replace with actual image URL
+                marker: null
+            },
+            { 
+                name: 'John Smith', 
+                location: [49.2827, -123.1207], // Vancouver, Canada
+                bio: 'A contemporary artist known for his sculpture work.',
+                image: 'https://via.placeholder.com/100', // Replace with actual image URL
+                marker: null
+            },
+            { 
+                name: 'Alice Johnson', 
+                location: [43.65107, -79.347015], // Toronto, Canada
+                bio: 'An artist known for her digital art and installations.',
+                image: 'https://via.placeholder.com/100', // Replace with actual image URL
+                marker: null
+            },
+            { 
+                name: 'Michael Brown', 
+                location: [51.0447, -114.0719], // Calgary, Canada
+                bio: 'A mixed media artist from the heart of Alberta.',
+                image: 'https://via.placeholder.com/100', // Replace with actual image URL
+                marker: null
+            },
+            { 
+                name: 'Eva White', 
+                location: [45.5088, -73.5878], // Montreal, Canada
+                bio: 'A painter who captures the beauty of natural landscapes.',
+                image: 'https://via.placeholder.com/100', // Replace with actual image URL
+                marker: null
+            }
+        ];
 
-        // Create a marker for Jane Doe and bind a popup
-        L.marker(janeDoeLocation).addTo(map)
-            .bindPopup(janeDoeProfile);
+        // Create markers and bind them to the map
+        var markers = [];
+        artists.forEach(function(artist) {
+            var profile = createArtistProfile(artist.name, artist.bio, artist.location.join(', '), artist.image);
+            var marker = L.marker(artist.location, { title: artist.name }).addTo(map)
+                .bindPopup(profile);
 
-        // Example for artist John Smith
-        var artistLocation = [49.2827, -123.1207]; // Vancouver, Canada
-        var artistImage = 'https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTExL2Rlc2lnbndpdGhtZTA5X2FfcmVhbGlzdGljX3Bob3RvX29mX2FfcGVyc29uX3Npbmdpbmdfd2l0aF9hX21pY185MDk4Yzc0OS0zMmJkLTQ3YzUtOTBmNS05YTdiYzBmN2ZmZDkucG5n.png'; // Replace with actual image URL
-        var artistProfile = createArtistProfile('John Smith', 'A contemporary artist known for his sculpture work.', 'Vancouver, Canada', artistImage);
+            // Store the marker for the search
+            artist.marker = marker;
+            markers.push(marker);
+        });
 
-        // Add another artist marker
-        L.marker(artistLocation).addTo(map)
-            .bindPopup(artistProfile);
+        // Create the search control
+        var searchControl = new L.Control.Search({
+            layer: L.layerGroup(markers), // Layer to search through (all artist markers)
+            initial: false, // Disable auto-initialization of search
+            propertyName: 'title', // Search based on the marker's title (artist name)
+            zoom: 12, // Zoom level after search
+            marker: false // Disable the search result marker (we just focus on the original marker)
+        });
+
+        // Add search control to the map
+        map.addControl(searchControl);
+
+        // Optional: Add a reset zoom feature
+        map.on('search:locationfound', function(e) {
+            map.setView(e.latlng, 14); // Zoom in after search result is found
+        });
     </script>
 </body>
 </html>
