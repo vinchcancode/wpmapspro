@@ -41,21 +41,21 @@
             font-family: Arial, sans-serif;
         }
 
-        /* Search field styling */
+        /* Search field and Zoom Out button container */
         .search-container {
             position: absolute;
             top: 10px;
             left: 50%;
             transform: translateX(-50%);
             width: 80%;
-            max-width: 400px;
+            max-width: 600px;
             z-index: 1000; /* Ensure it is above the map */
             display: flex;
-            justify-content: center;
+            justify-content: space-between; /* Space between search and button */
         }
 
         .search-input {
-            width: 100%;
+            width: 80%;
             padding: 10px;
             font-size: 16px;
             border-radius: 4px;
@@ -63,21 +63,16 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Zoom out button styling */
         .zoom-out-btn {
-            position: absolute;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
+            width: 18%;
             background-color: #4CAF50;
             color: white;
-            padding: 10px 20px;
+            padding: 10px;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            z-index: 1000; /* Ensure it is above the map */
         }
 
         .zoom-out-btn:hover {
@@ -88,9 +83,9 @@
 <body>
     <div class="search-container">
         <input type="text" id="searchField" class="search-input" placeholder="Search for an artist..." />
+        <button class="zoom-out-btn" id="zoomOutButton">Zoom Out</button>
     </div>
     <div id="map"></div>
-    <button class="zoom-out-btn" id="zoomOutButton">Zoom Out</button>
 
     <footer>
         Developed by: Vinch
